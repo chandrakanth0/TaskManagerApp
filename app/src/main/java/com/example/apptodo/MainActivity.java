@@ -35,6 +35,18 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        mAuth = FirebaseAuth.getInstance();
+
+        // Check if user is already logged in
+        if (mAuth.getCurrentUser() != null) {
+            // User is logged in, go to WelcomeActivity
+            startActivity(new Intent(MainActivity.this, WelcomeActivity.class));
+            finish();  // Close MainActivity so user doesn't come back here
+            return;  // Stop further execution
+        }
+
+
         setContentView(R.layout.activity_main);
 
         // Initialize Firebase
