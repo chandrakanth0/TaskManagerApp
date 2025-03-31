@@ -21,6 +21,7 @@ import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import java.util.ArrayList;
@@ -71,6 +72,12 @@ public class WelcomeActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(taskAdapter);
 
+
+
+
+
+        // Add Task Button Click
+        addTaskButton.setOnClickListener(v -> addTask());
         // Load tasks from Firestore
         loadTasks();
 
@@ -120,9 +127,38 @@ public class WelcomeActivity extends AppCompatActivity {
                 });
     }
 
+
+    private void addTask() {
+        String taskText = taskInput.getText().toString().trim();
+        if (taskText.isEmpty()) {
+            Toast.makeText(this, "Enter a task", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String userId = mAuth.getCurrentUser().getUid();  // Get current user ID
+        DocumentReference userRef = db.collection("users").document(userId);
+        CollectionReference tasksRef = userRef.collection("tasks"); // Reference to user's tasks
+
+        // Task data
+        Map<String, Object> taskData = new HashMap<>();
+        taskData.put("task", taskText);
+
+
+        tasksRef.add(taskData).addOnSuccessListener(documentReference -> {
+            taskList.add(taskText);
+            taskAdapter.notifyDataSetChanged();
+            taskInput.setText("");
+        }).addOnFailureListener(e -> {
+            Toast.makeText(WelcomeActivity.this, "Failed to add task", Toast.LENGTH_SHORT).show();
+        });
+
+    }
+
     private void logoutUser() {
         mAuth.signOut();
         startActivity(new Intent(this, LoginActivity.class));
         finish();
+
+
     }
 }
