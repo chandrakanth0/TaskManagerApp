@@ -39,7 +39,10 @@ public class WelcomeActivity extends AppCompatActivity {
     private NavigationView navigationView;
     private Button menuButton;
 
-    private TextView welcomeText;
+//    private TextView welcomeText;
+    private TextView navName;
+    private TextView navMail;
+
     private EditText taskInput;
     private Button addTaskButton;
     private RecyclerView recyclerView;
@@ -57,7 +60,7 @@ public class WelcomeActivity extends AppCompatActivity {
         tasksRef = db.collection("tasks");
 
         // UI Elements
-        welcomeText = findViewById(R.id.welcomeText);
+//        welcomeText = findViewById(R.id.welcomeText);
 
         taskInput = findViewById(R.id.taskInput);
         addTaskButton = findViewById(R.id.addTaskButton);
@@ -65,6 +68,9 @@ public class WelcomeActivity extends AppCompatActivity {
         menuButton = findViewById(R.id.menuButton);
         drawerLayout = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.navigationView);
+        View headerView = navigationView.getHeaderView(0);
+        navName = headerView.findViewById(R.id.userName);
+        navMail = headerView.findViewById(R.id.userEmail);
 
         // RecyclerView Setup
         taskList = new ArrayList<>();
@@ -83,6 +89,9 @@ public class WelcomeActivity extends AppCompatActivity {
 
         // Open Drawer
         menuButton.setOnClickListener(v -> drawerLayout.openDrawer(GravityCompat.START));
+
+
+//        navName = findViewById(R.id.userName);
 
         navigationView.setNavigationItemSelectedListener(item -> {
             int id = item.getItemId();
@@ -106,7 +115,10 @@ public class WelcomeActivity extends AppCompatActivity {
                     .addOnSuccessListener(document -> {
                         if (document.exists()) {
                             String fullName = document.getString("fullName");
-                            welcomeText.setText("Welcome " + fullName + "!");
+//                            welcomeText.setText("Welcome " + fullName + "!");
+
+                            navName.setText(fullName);
+                            navMail.setText(document.getString("email"));
                         }
                     });
         }
