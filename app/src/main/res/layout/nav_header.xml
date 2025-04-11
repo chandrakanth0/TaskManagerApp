@@ -4,17 +4,18 @@
     android:layout_height="wrap_content"
     android:padding="16dp"
     android:orientation="vertical"
-    android:background="@color/white">
+    android:background="#B097D5">
+
+    <!--        android:background="@drawable/circle_background"-->
+
 
     <ImageView
         android:id="@+id/userImage"
         android:layout_width="80dp"
         android:layout_height="80dp"
-        android:src="@drawable/ic_profile"
-        android:layout_gravity="center"
-        android:scaleType="centerCrop"/>
-<!--        android:background="@drawable/circle_background"-->
-
+        android:layout_gravity="start"
+        android:scaleType="centerCrop"
+        android:src="@drawable/ic_profile" />
 
     <TextView
         android:id="@+id/userName"
