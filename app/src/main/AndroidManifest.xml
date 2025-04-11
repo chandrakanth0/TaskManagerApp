@@ -33,6 +33,7 @@
             android:configChanges="keyboardHidden|screenSize"
             />
 
+        <activity android:name=".AddTaks" android:exported="true"/>
 
     </application>
 

@@ -5,6 +5,10 @@
         android:title="Profile" />
 
     <item
+        android:id="@+id/nav_add_task"
+        android:icon="@drawable/ic_add" android:title="Add Task" />
+
+    <item
         android:id="@+id/nav_tasks"
         android:icon="@drawable/ic_tasks"
         android:title="View Tasks" />

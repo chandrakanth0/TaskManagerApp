@@ -60,7 +60,12 @@ public class ProfileActivity extends AppCompatActivity {
 
             if (id == R.id.nav_tasks) {
                 startActivity(new Intent(ProfileActivity.this, WelcomeActivity.class));
-            } else if (id == R.id.nav_logout) {
+            }
+
+            else if (id == R.id.nav_add_task) {
+                startActivity(new Intent(this, AddTaks.class)); // Start AddTaks Activity
+            }
+            else if (id == R.id.nav_logout) {
                 logoutUser();
             }
 
