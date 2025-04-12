@@ -37,6 +37,8 @@ public class AddTaks extends AppCompatActivity {
     private FirebaseFirestore db;
     private Calendar startDateCalendar = Calendar.getInstance();
     private Calendar endDateCalendar = Calendar.getInstance();
+    private TextView navName;
+    private TextView navMail;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +52,12 @@ public class AddTaks extends AppCompatActivity {
         // Initialize UI elements
         drawerLayoutAddTask = findViewById(R.id.drawer_layout_add_task);
         navigationViewAddTask = findViewById(R.id.navigationViewAddTask);
+
+        View headerView = navigationViewAddTask.getHeaderView(0);
+        navName = headerView.findViewById(R.id.userName);
+        navMail = headerView.findViewById(R.id.userEmail);
+
+
         menuButtonAddTask = findViewById(R.id.menuButtonAddTask);
         editTextTaskTitle = findViewById(R.id.editTextTaskTitle);
         editTextTaskDescription = findViewById(R.id.editTextTaskDescription);
@@ -59,6 +67,26 @@ public class AddTaks extends AppCompatActivity {
         selectedStartDate = findViewById(R.id.selectedStartDate);
         selectEndDateButton = findViewById(R.id.selectEndDateButton);
         selectedEndDate = findViewById(R.id.selectedEndDate);
+
+
+
+
+        final FirebaseUser user = mAuth.getCurrentUser();
+        if (user != null) {
+            db.collection("users").document(user.getUid()).get()
+                    .addOnSuccessListener(document -> {
+                        if (document.exists()) {
+                            String fullName = document.getString("fullName");
+                            navName.setText(fullName);
+                            navMail.setText(document.getString("email"));
+                        }
+                    });
+        }
+
+
+
+
+
 
         // Open Drawer on Menu Button Click
         menuButtonAddTask.setOnClickListener(v -> drawerLayoutAddTask.openDrawer(GravityCompat.START));
@@ -120,7 +148,7 @@ public class AddTaks extends AppCompatActivity {
             boolean completed = false; // Default value
 
             if (!title.isEmpty() && !description.isEmpty() && !startDate.isEmpty() && !dueDate.isEmpty() && !time.isEmpty()) {
-                FirebaseUser user = mAuth.getCurrentUser();
+//                user = mAuth.getCurrentUser();
                 if (user != null) {
                     Map<String, Object> taskData = new HashMap<>();
                     taskData.put("title", title);

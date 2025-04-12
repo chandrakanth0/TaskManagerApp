@@ -2,14 +2,14 @@ package com.example.apptodo;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -19,9 +19,12 @@ import com.google.firebase.firestore.FirebaseFirestore;
 public class ProfileActivity extends AppCompatActivity {
 
     private DrawerLayout drawerLayout;
+    private RecyclerView recyclerView;
     private NavigationView navigationView;
     private FirebaseAuth auth;
-    private TextView userName, userEmail;
+    private FirebaseFirestore db;
+    private TextView navName, navMail;
+    private TextView profileName, profileEmail, profilePhone;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,22 +34,31 @@ public class ProfileActivity extends AppCompatActivity {
         // Firebase Auth
         auth = FirebaseAuth.getInstance();
         FirebaseUser user = auth.getCurrentUser();
+        db = FirebaseFirestore.getInstance();
 
         // UI Elements
         drawerLayout = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.navigationView);
-        userName = findViewById(R.id.userName);
-        userEmail = findViewById(R.id.userEmail);
+        View headerView = navigationView.getHeaderView(0);
+        navName = headerView.findViewById(R.id.userName);
+        navMail = headerView.findViewById(R.id.userEmail);
+        profileName = findViewById(R.id.userName);
+        profileEmail = findViewById(R.id.userEmail);
+        profilePhone = findViewById(R.id.userPhone);
 
-        // Set User Info
         if (user != null) {
-            FirebaseFirestore.getInstance().collection("users")
-                    .document(user.getUid())
-                    .get()
+            db.collection("users").document(user.getUid()).get()
                     .addOnSuccessListener(document -> {
                         if (document.exists()) {
-                            userName.setText(document.getString("fullName"));
-                            userEmail.setText(document.getString("email"));
+                            String fullName = document.getString("fullName");
+                            String email = document.getString("email");
+                            String phone = document.getString("phone");
+
+                            navName.setText(fullName);
+                            navMail.setText(email);
+                            profileName.setText(fullName);
+                            profileEmail.setText(email);
+                            profilePhone.setText(phone != null ? phone : "N/A");
                         }
                     });
         }
@@ -60,12 +72,9 @@ public class ProfileActivity extends AppCompatActivity {
 
             if (id == R.id.nav_tasks) {
                 startActivity(new Intent(ProfileActivity.this, WelcomeActivity.class));
-            }
-
-            else if (id == R.id.nav_add_task) {
-                startActivity(new Intent(this, AddTaks.class)); // Start AddTaks Activity
-            }
-            else if (id == R.id.nav_logout) {
+            } else if (id == R.id.nav_add_task) {
+                startActivity(new Intent(this, AddTaks.class));
+            } else if (id == R.id.nav_logout) {
                 logoutUser();
             }
 

@@ -45,7 +45,8 @@ dependencies {
     implementation(libs.firebase.database)
 
     implementation("androidx.cardview:cardview:1.0.0") // Add this line
-
+    implementation("com.google.android.material:material:1.11.0")// Or the latest version
+    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0") // Or the latest version
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
