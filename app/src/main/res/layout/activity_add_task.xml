@@ -6,8 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/background_image"
-    tools:context=".AddTaks"
-    >
+    tools:context=".AddTaks">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -24,9 +23,9 @@
             android:text="☰ Add Task"
             android:textAlignment="viewStart"
             android:textSize="18sp"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/taskTitleInputLayout"
@@ -39,9 +38,9 @@
             app:boxCornerRadiusBottomStart="8dp"
             app:boxCornerRadiusTopEnd="8dp"
             app:boxCornerRadiusTopStart="8dp"
-            app:layout_constraintTop_toBottomOf="@id/menuButtonAddTask"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
+            app:layout_constraintTop_toBottomOf="@id/menuButtonAddTask">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/editTextTaskTitle"
@@ -62,9 +61,9 @@
             app:boxCornerRadiusBottomStart="8dp"
             app:boxCornerRadiusTopEnd="8dp"
             app:boxCornerRadiusTopStart="8dp"
-            app:layout_constraintTop_toBottomOf="@id/taskTitleInputLayout"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
+            app:layout_constraintTop_toBottomOf="@id/taskTitleInputLayout">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/editTextTaskDescription"
@@ -82,10 +81,10 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:text="Start Date"
-            android:textSize="16sp"
             android:textColor="#212121"
-            app:layout_constraintTop_toBottomOf="@id/taskDescriptionInputLayout"
-            app:layout_constraintStart_toStartOf="parent" />
+            android:textSize="16sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/taskDescriptionInputLayout" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/selectStartDateButton"
@@ -96,20 +95,20 @@
             android:text="Select Date"
             android:textColor="#1976D2"
             app:cornerRadius="8dp"
-            app:layout_constraintTop_toBottomOf="@id/startDateLabel"
+            app:layout_constraintEnd_toStartOf="@+id/guideline"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/guideline" />
+            app:layout_constraintTop_toBottomOf="@id/startDateLabel" />
 
         <TextView
             android:id="@+id/selectedStartDate"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:textSize="16sp"
             android:textColor="#757575"
-            app:layout_constraintTop_toBottomOf="@id/selectStartDateButton"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toStartOf="@+id/guideline"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/guideline" />
+            app:layout_constraintTop_toBottomOf="@id/selectStartDateButton" />
 
         <TextView
             android:id="@+id/dueDateLabel"
@@ -117,10 +116,11 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:text="Due Date"
-            android:textSize="16sp"
             android:textColor="#212121"
-            app:layout_constraintTop_toBottomOf="@id/taskDescriptionInputLayout"
-            app:layout_constraintStart_toEndOf="@+id/guideline" />
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/guideline"
+            app:layout_constraintTop_toBottomOf="@id/taskDescriptionInputLayout" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/selectEndDateButton"
@@ -131,20 +131,20 @@
             android:text="Select Date"
             android:textColor="#1976D2"
             app:cornerRadius="8dp"
-            app:layout_constraintTop_toBottomOf="@id/dueDateLabel"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/guideline"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintTop_toBottomOf="@id/dueDateLabel" />
 
         <TextView
             android:id="@+id/selectedEndDate"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:textSize="16sp"
             android:textColor="#757575"
-            app:layout_constraintTop_toBottomOf="@id/selectEndDateButton"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/guideline"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintTop_toBottomOf="@id/selectEndDateButton" />
 
         <TextView
             android:id="@+id/timeLabel"
@@ -152,10 +152,10 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:text="Time"
-            android:textSize="16sp"
             android:textColor="#212121"
-            app:layout_constraintTop_toBottomOf="@id/selectedStartDate"
-            app:layout_constraintStart_toStartOf="parent" />
+            android:textSize="16sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/selectedStartDate" />
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/timeInputLayout"
@@ -168,15 +168,17 @@
             app:boxCornerRadiusBottomStart="8dp"
             app:boxCornerRadiusTopEnd="8dp"
             app:boxCornerRadiusTopStart="8dp"
-            app:layout_constraintTop_toBottomOf="@id/timeLabel"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
+            app:layout_constraintTop_toBottomOf="@id/timeLabel">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/editTextTime"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="time" />
+                android:focusable="false"
+                android:clickable="true"
+                android:inputType="none" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -185,13 +187,12 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
-
             android:text="Add New Task"
             android:textColor="#FFFFFF"
             app:cornerRadius="8dp"
-            app:layout_constraintTop_toBottomOf="@id/timeInputLayout"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintTop_toBottomOf="@id/timeInputLayout" />
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline"
