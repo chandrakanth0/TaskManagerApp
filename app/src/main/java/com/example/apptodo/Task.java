@@ -9,6 +9,7 @@ public class Task {
     private String time;
     private boolean completed;
     private String documentId; // Consistent field for Firestore document ID
+    private Long remainingDays; // Add this field
 
     // Required empty constructor for Firebase
     public Task() {}
@@ -55,6 +56,10 @@ public class Task {
         return completed;
     }
 
+    public Long getRemainingDays() { // Add this getter
+        return remainingDays;
+    }
+
     // Setters
     public void setId(String id) {
         this.id = id;
@@ -86,5 +91,9 @@ public class Task {
 
     public void setDocumentId(String documentId) {
         this.documentId = documentId;
+    }
+
+    public void setRemainingDays(Long remainingDays) { // Add this setter
+        this.remainingDays = remainingDays;
     }
 }

@@ -55,7 +55,7 @@ public class WelcomeActivity extends AppCompatActivity {
 
         // RecyclerView Setup
         taskList = new ArrayList<>();
-        taskAdapter = new TaskAdapter(taskList);
+        taskAdapter = new TaskAdapter(this ,taskList);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(taskAdapter);
 

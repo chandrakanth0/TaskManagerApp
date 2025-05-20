@@ -1,18 +1,29 @@
 package com.example.apptodo;
 
+import android.Manifest;
+import android.app.AlarmManager;
 import android.app.DatePickerDialog;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.TimePickerDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
-import android.view.MenuItem;
+import android.provider.Settings;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
@@ -28,10 +39,10 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 public class AddTaks extends AppCompatActivity {
 
+    private static final String CHANNEL_ID = "task_alarms";
     private DrawerLayout drawerLayoutAddTask;
     private NavigationView navigationViewAddTask;
     private Button menuButtonAddTask;
@@ -47,6 +58,8 @@ public class AddTaks extends AppCompatActivity {
     private TextView navMail;
     private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
     private SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+    private AlarmManager alarmManager;
+    private ActivityResultLauncher<String> requestAlarmPermissionLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +69,7 @@ public class AddTaks extends AppCompatActivity {
         // Initialize Firebase
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
+        alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 
         // Initialize UI elements
         drawerLayoutAddTask = findViewById(R.id.drawer_layout_add_task);
@@ -74,6 +88,21 @@ public class AddTaks extends AppCompatActivity {
         selectedStartDate = findViewById(R.id.selectedStartDate);
         selectEndDateButton = findViewById(R.id.selectEndDateButton);
         selectedEndDate = findViewById(R.id.selectedEndDate);
+
+        // Initialize permission request launcher for SCHEDULE_EXACT_ALARM
+        requestAlarmPermissionLauncher = registerForActivityResult(
+                new ActivityResultContracts.RequestPermission(),
+                isGranted -> {
+                    if (isGranted) {
+                        Toast.makeText(this, "Alarm permission granted", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(this, "Alarm permission denied. Reminders may not work precisely.", Toast.LENGTH_LONG).show();
+                    }
+                }
+        );
+
+        // Create notification channel
+        createNotificationChannel();
 
         final FirebaseUser user = mAuth.getCurrentUser();
         if (user != null) {
@@ -150,7 +179,7 @@ public class AddTaks extends AppCompatActivity {
             timePickerDialog.show();
         });
 
-        // Button click to add a new task to Firestore
+        // Button click to add a new task to Firestore and set alarm
         buttonAddTask.setOnClickListener(v -> {
             String title = editTextTaskTitle.getText().toString().trim();
             String description = editTextTaskDescription.getText().toString().trim();
@@ -189,6 +218,8 @@ public class AddTaks extends AppCompatActivity {
                                 .add(taskData)
                                 .addOnSuccessListener(documentReference -> {
                                     Toast.makeText(AddTaks.this, "Task added successfully", Toast.LENGTH_SHORT).show();
+                                    // Set the alarm after successfully adding the task
+                                    setAlarmForTask(title, description, startDate, time, documentReference.getId());
                                     finish();
                                 })
                                 .addOnFailureListener(e -> {
@@ -202,6 +233,77 @@ public class AddTaks extends AppCompatActivity {
                 Toast.makeText(AddTaks.this, "Please enter all task details", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = "Task Alarms";
+            String description = "Notifications for upcoming tasks";
+            int importance = NotificationManager.IMPORTANCE_HIGH;
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
+            channel.setDescription(description);
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
+    }
+
+    private void setAlarmForTask(String title, String description, String startDateStr, String timeStr, String taskId) {
+        Calendar alarmCalendar = Calendar.getInstance();
+        SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
+
+        try {
+            Date alarmDateTime = dateTimeFormat.parse(startDateStr + " " + timeStr);
+            alarmCalendar.setTime(alarmDateTime);
+
+            // Check if the alarm time is in the future
+            if (alarmCalendar.getTimeInMillis() <= System.currentTimeMillis()) {
+                Toast.makeText(this, "Alarm time must be in the future", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            Intent intent = new Intent(this, AlarmReceiver.class);
+            intent.putExtra("task_title", title);
+            intent.putExtra("task_description", description);
+            intent.putExtra("notification_id", generateNotificationId(taskId)); // Use task ID for unique ID
+
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(this, generateAlarmRequestId(taskId), intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                if (alarmManager != null && alarmManager.canScheduleExactAlarms()) {
+                    // Permission to schedule exact alarms is granted
+                    alarmManager.setExact(AlarmManager.RTC_WAKEUP, alarmCalendar.getTimeInMillis(), pendingIntent);
+                    Toast.makeText(this, "Alarm set for " + dateTimeFormat.format(alarmCalendar.getTime()), Toast.LENGTH_LONG).show();
+                } else {
+                    // Permission to schedule exact alarms is NOT granted
+                    Toast.makeText(this, "Precise reminders may not work. Please grant the necessary permission.", Toast.LENGTH_LONG).show();
+                    // Consider showing a dialog or UI element to guide the user to settings
+                    Intent requestIntent = new Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM);
+                    startActivity(requestIntent);
+                    // As a fallback, you can set a less precise alarm
+                    // alarmManager.set(AlarmManager.RTC_WAKEUP, alarmCalendar.getTimeInMillis(), pendingIntent);
+                }
+            } else {
+                // For older Android versions, just set the alarm
+                if (alarmManager != null) {
+                    alarmManager.setExact(AlarmManager.RTC_WAKEUP, alarmCalendar.getTimeInMillis(), pendingIntent);
+                    Toast.makeText(this, "Alarm set for " + dateTimeFormat.format(alarmCalendar.getTime()), Toast.LENGTH_LONG).show();
+                }
+            }
+
+        } catch (ParseException e) {
+            Toast.makeText(this, "Error parsing date and time for alarm", Toast.LENGTH_SHORT).show();
+            e.printStackTrace();
+        }
+    }
+
+    private int generateAlarmRequestId(String taskId) {
+        // Generate a unique request code based on the task ID
+        return taskId.hashCode();
+    }
+
+    private int generateNotificationId(String taskId) {
+        // Generate a unique notification ID based on the task ID
+        return taskId.hashCode();
     }
 
     private void updateStartDateDisplay() {

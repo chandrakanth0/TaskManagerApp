@@ -37,7 +37,7 @@ public class TaskMain extends AppCompatActivity {
 
         // Initialize task list and adapter
         taskList = new ArrayList<>();
-        taskAdapter = new TaskAdapter(taskList);
+        taskAdapter = new TaskAdapter(this ,taskList);
         recyclerViewTasks.setLayoutManager(new LinearLayoutManager(this));
         recyclerViewTasks.setAdapter(taskAdapter);
 
